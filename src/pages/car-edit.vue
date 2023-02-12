@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { carService } from '@/services/car.service.js'
+
 export default {
     data() {
         return {
