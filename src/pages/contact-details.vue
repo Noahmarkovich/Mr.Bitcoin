@@ -3,7 +3,7 @@
         <h2>{{contact.name}}</h2>
         <h3>{{contact.email}}</h3>
         <img v-bind:src="'https://robohash.org/'+ contact.name + '?set=set5'" />
-        <RouterLink to="/contact">
+        <RouterLink to="/contact/edit/">
             <button>Back</button>
         </RouterLink>
     </div>
@@ -20,6 +20,7 @@ export default {
     async created(){
         const contactId = this.$route.params._id
         this.contact = await contactService.getContactById(contactId)
+        
     }
 }
 </script>

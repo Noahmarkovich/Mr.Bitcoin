@@ -1,9 +1,9 @@
 <template>
     <div class="main-container">
         <UserMsg />
-        <!-- <CarFilter @filter="onSetFilterBy" /> -->
+        <ContactFilter @filter="onSetFilterBy" />
+        <RouterLink to="/contact/edit"><button>Add a contact</button></RouterLink>
         <ContactList @remove="removeContact"  v-if="contacts" :contacts="contacts" />
-        <!-- <RouterLink to="/car/edit"><button>Add a Car</button></RouterLink> -->
     </div>
 </template>
 
@@ -12,18 +12,15 @@ import { contactService } from '@/services/contact.service.js'
 import { eventBus } from '@/services/eventBus.service.js'
 
 import ContactList from '@/cmps/contact-list.vue'
-// import CarFilter from '@/cmps/car-filter.vue'
+import ContactFilter from '@/cmps/contact-filter.vue'
 import UserMsg from '@/cmps/user-msg.vue'
 
 export default {
     data() {
-        return {
-            contacts: null,
-            filterBy: {},
-        }
+        return {}
     },
     async created() {
-        this.contacts = await contactService.getContacts()
+        this.$store.dispatch({type : "loadContacts"})
     },
     methods: {
         async removeContact(contactId) {
@@ -32,23 +29,25 @@ export default {
                 type: 'success',
                 timeout: 2500,
             }
-            await contactService.deleteContact(contactId)
-            this.contacts = this.contacts.filter(contact => contact._id !== contactId)
-            eventBus.emit('user-msg', msg)
+            // await contactService.deleteContact(contactId)
+            // this.contacts = this.contacts.filter(contact => contact._id !== contactId)
+            // eventBus.emit('user-msg', msg)
+            this.$store.dispatch({ type: "removeContact", contactId })
+            eventBus.emit("user-msg", msg)
         },
         onSetFilterBy(filterBy) {
-            this.filterBy = filterBy
+            this.$store.dispatch({ type: "loadContacts", filterBy })
         },
     },
     computed: {
-        filteredContacts() {
-            const regex = new RegExp(this.filterBy.txt, 'i')
-            return this.cars.filter(contact => regex.test(contact.vendor))
-        },
+
+        contacts() {
+      return this.$store.getters.contacts;
+    },
     },
     components: {
         ContactList,
-        // CarFilter,
+        ContactFilter,
         UserMsg,
     },
 }

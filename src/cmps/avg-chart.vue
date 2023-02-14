@@ -1,0 +1,55 @@
+<template>
+    <div>
+        <Bar v-if='chartData.labels' id="my-chart-id" :options="chartOptions" :data="chartData" />
+    </div>
+</template>
+
+<script>
+//   import ValueChart from "@/cmps/value-chart.vue";
+//   import AvgChart from "@/cmps/avg-chart.vue";
+
+import { Bar } from 'vue-chartjs'
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
+
+import { bitcoinService } from '@/services/bitcoin.service.js'
+
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
+
+export default {
+    name: 'BarChart',
+    components: { Bar },
+    data() {
+        return {
+            chartData: {
+                labels: null,
+                datasets: [
+                    {
+                        label: null,
+                        // backgroundColor: "#f7931a99",
+                        data: null,
+                    },
+                ],
+            },
+            chartOptions: {
+                responsive: true,
+            },
+        }
+    },
+    async created() {
+        this.sizes = await bitcoinService.getAvgBlockSize();
+        console.log('this.prices.values:', this.sizes.values)
+        this.chartData.labels = this.sizes.values.map(value => {
+            const date = new Date(value.x * 1000)
+            return `${date.getDate() + 1}.${date.getMonth() + 1}`
+        })
+        this.chartData.datasets[0].data = this.sizes.values.map(value => value.y)
+        this.chartData.datasets[0].label = this.sizes.description
+    },
+
+}
+
+</script>
+
+<style lang="scss">
+
+</style>
